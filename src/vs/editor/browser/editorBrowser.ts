@@ -17,6 +17,7 @@ import { IWordAtPosition } from 'vs/editor/common/core/wordHelper';
 import { ICursorPositionChangedEvent, ICursorSelectionChangedEvent } from 'vs/editor/common/cursorEvents';
 import { IDiffComputationResult, ILineChange } from 'vs/editor/common/diff/legacyLinesDiffComputer';
 import * as editorCommon from 'vs/editor/common/editorCommon';
+import { CompletionItem, CompletionListSelection } from 'vs/editor/common/languages';
 import { GlyphMarginLane, ICursorStateComputer, IIdentifiedSingleEditOperation, IModelDecoration, IModelDeltaDecoration, ITextModel, PositionAffinity } from 'vs/editor/common/model';
 import { InjectedText } from 'vs/editor/common/modelLineProjectionData';
 import { IModelContentChangedEvent, IModelDecorationsChangedEvent, IModelLanguageChangedEvent, IModelLanguageConfigurationChangedEvent, IModelOptionsChangedEvent, IModelTokensChangedEvent } from 'vs/editor/common/textModelEvents';
@@ -612,6 +613,29 @@ export interface ICodeEditor extends editorCommon.IEditor {
 	 * @event
 	 */
 	readonly onDidChangeCursorPosition: Event<ICursorPositionChangedEvent>;
+
+	// MARK: - Suggest Widget Customizations
+
+	/**
+	 * An event emitted when the suggest widget displays.
+	 * @event
+	 */
+	readonly onSuggestWidgetDidShow: Event<CompletionItem[]>;
+
+	/**
+	 * An event emitted when the suggest widget focuses a completion item.
+	 * @event
+	 */
+	readonly onSuggestWidgetDidFocus: Event<CompletionListSelection>;
+
+	/**
+	 * An event emitted when the suggest widget is ordered out.
+	 * @event
+	 */
+	readonly onSuggestWidgetDidHide: Event<void>;
+
+	// MARK: - End Suggest Widget Customizations
+
 	/**
 	 * An event emitted when the cursor selection has changed.
 	 * @event

@@ -5705,6 +5705,29 @@ declare namespace monaco.editor {
 		 * @event
 		 */
 		readonly onDidChangeCursorPosition: IEvent<ICursorPositionChangedEvent>;
+
+		// MARK: - Suggest Widget Customizations
+
+		/**
+		 * An event emitted when the suggest widget displays.
+		 * @event
+		 */
+		readonly onSuggestWidgetDidShow: IEvent<languages.CompletionItem[]>;
+
+		/**
+		 * An event emitted when the suggest widget focuses a completion item.
+		 * @event
+		 */
+		readonly onSuggestWidgetDidFocus: IEvent<languages.CompletionListSelection>;
+
+		/**
+		 * An event emitted when the suggest widget is ordered out.
+		 * @event
+		 */
+		readonly onSuggestWidgetDidHide: IEvent<void>;
+
+		// MARK: - End Suggest Widget Customizations
+
 		/**
 		 * An event emitted when the cursor selection has changed.
 		 * @event
@@ -7033,6 +7056,14 @@ declare namespace monaco.languages {
 		suggestions: CompletionItem[];
 		incomplete?: boolean;
 		dispose?(): void;
+	}
+
+	/**
+	 * Info provided on focus of a completion list item.
+	 */
+	export interface CompletionListSelection {
+		item: CompletionItem;
+		index: number;
 	}
 
 	/**

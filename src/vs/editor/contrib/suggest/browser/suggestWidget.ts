@@ -35,6 +35,7 @@ import { canExpandCompletionItem, SuggestDetailsOverlay, SuggestDetailsWidget } 
 import { getAriaId, ItemRenderer } from './suggestWidgetRenderer';
 import { getListStyles } from 'vs/platform/theme/browser/defaultStyles';
 import { status } from 'vs/base/browser/ui/aria/aria';
+import * as languages from 'vs/editor/common/languages';
 
 /**
  * Suggest widget colors
@@ -95,6 +96,19 @@ class PersistedWidgetSize {
 	reset(): void {
 		this._service.remove(this._key, StorageScope.PROFILE);
 	}
+}
+
+type EditorWithSuggestWidgetEvents = ICodeEditor & {
+	_onSuggestWidgetDidShow: Emitter<languages.CompletionItem[]>,
+	_onSuggestWidgetDidFocus: Emitter<languages.CompletionListSelection>,
+	_onSuggestWidgetDidHide: Emitter<void>,
+};
+
+function isEditorWithSuggestWidgetEvents(editor: any): editor is EditorWithSuggestWidgetEvents {
+	return editor
+		&& typeof editor._onSuggestWidgetDidFocus == 'object'
+		&& typeof editor._onSuggestWidgetDidShow == 'object'
+		&& typeof editor._onSuggestWidgetDidHide == 'object';
 }
 
 export class SuggestWidget implements IDisposable {
@@ -433,6 +447,11 @@ export class SuggestWidget implements IDisposable {
 
 		// emit an event
 		this._onDidFocus.fire({ item, index, model: this._completionModel });
+		setTimeout(() => {
+			if (isEditorWithSuggestWidgetEvents(this.editor)) {
+				this.editor._onSuggestWidgetDidFocus.fire({ item: item.completion, index });
+			}
+		}); // defer to ensure fire after "show" event
 	}
 
 	private _setState(state: State): void {
@@ -575,6 +594,12 @@ export class SuggestWidget implements IDisposable {
 			// Reset focus border
 			this._details.widget.domNode.classList.remove('focused');
 		});
+
+		if (isEditorWithSuggestWidgetEvents(this.editor)) {
+			this.editor._onSuggestWidgetDidShow.fire(
+				completionModel.items.map(item => item.completion)
+			);
+		}
 	}
 
 	focusSelected(): void {
@@ -753,6 +778,9 @@ export class SuggestWidget implements IDisposable {
 
 		this._setState(State.Hidden);
 		this._onDidHide.fire(this);
+		if (isEditorWithSuggestWidgetEvents(this.editor)) {
+			this.editor._onSuggestWidgetDidHide.fire();
+		}
 		this.element.clearSashHoverState();
 
 		// ensure that a reasonable widget height is persisted so that

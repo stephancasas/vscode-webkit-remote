@@ -60,6 +60,7 @@ import { INotificationService, Severity } from 'vs/platform/notification/common/
 import { editorErrorForeground, editorHintForeground, editorInfoForeground, editorWarningForeground } from 'vs/platform/theme/common/colorRegistry';
 import { IThemeService, registerThemingParticipant } from 'vs/platform/theme/common/themeService';
 import { MenuId } from 'vs/platform/actions/common/actions';
+import { CompletionItem, CompletionListSelection } from 'vs/editor/common/languages';
 
 export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeEditor {
 
@@ -105,6 +106,19 @@ export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeE
 
 	private readonly _onDidChangeCursorPosition: Emitter<ICursorPositionChangedEvent> = this._register(new Emitter<ICursorPositionChangedEvent>({ deliveryQueue: this._deliveryQueue }));
 	public readonly onDidChangeCursorPosition: Event<ICursorPositionChangedEvent> = this._onDidChangeCursorPosition.event;
+
+	// MARK: - Suggest Widget Customizations
+
+	readonly _onSuggestWidgetDidShow: Emitter<CompletionItem[]> = this._register(new Emitter<CompletionItem[]>({ deliveryQueue: this._deliveryQueue }));
+	public readonly onSuggestWidgetDidShow: Event<CompletionItem[]> = this._onSuggestWidgetDidShow.event;
+
+	readonly _onSuggestWidgetDidFocus: Emitter<CompletionListSelection> = this._register(new Emitter<CompletionListSelection>({ deliveryQueue: this._deliveryQueue }));
+	public readonly onSuggestWidgetDidFocus: Event<CompletionListSelection> = this._onSuggestWidgetDidFocus.event;
+
+	readonly _onSuggestWidgetDidHide: Emitter<void> = this._register(new Emitter<void>({ deliveryQueue: this._deliveryQueue }));
+	public readonly onSuggestWidgetDidHide: Event<void> = this._onSuggestWidgetDidHide.event;
+
+	// MARK: - End Suggest Widget Customization
 
 	private readonly _onDidChangeCursorSelection: Emitter<ICursorSelectionChangedEvent> = this._register(new Emitter<ICursorSelectionChangedEvent>({ deliveryQueue: this._deliveryQueue }));
 	public readonly onDidChangeCursorSelection: Event<ICursorSelectionChangedEvent> = this._onDidChangeCursorSelection.event;

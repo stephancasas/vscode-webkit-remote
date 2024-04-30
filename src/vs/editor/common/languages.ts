@@ -588,6 +588,14 @@ export interface CompletionList {
 }
 
 /**
+ * Info provided on focus of a completion list item.
+ */
+export interface CompletionListSelection {
+	item: CompletionItem;
+	index: number;
+}
+
+/**
  * Info provided on partial acceptance.
  */
 export interface PartialAcceptInfo {
