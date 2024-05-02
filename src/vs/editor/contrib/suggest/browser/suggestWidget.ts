@@ -36,6 +36,7 @@ import { getAriaId, ItemRenderer } from './suggestWidgetRenderer';
 import { getListStyles } from 'vs/platform/theme/browser/defaultStyles';
 import { status } from 'vs/base/browser/ui/aria/aria';
 import * as languages from 'vs/editor/common/languages';
+import { CancellationToken } from 'vs/base/common/cancellation';
 
 /**
  * Suggest widget colors
@@ -447,11 +448,11 @@ export class SuggestWidget implements IDisposable {
 
 		// emit an event
 		this._onDidFocus.fire({ item, index, model: this._completionModel });
-		setTimeout(() => {
+		item.resolve(CancellationToken.None).then(() => {
 			if (isEditorWithSuggestWidgetEvents(this.editor)) {
 				this.editor._onSuggestWidgetDidFocus.fire({ item: item.completion, index });
 			}
-		}); // defer to ensure fire after "show" event
+		}).catch((ex) => console.warn('Suggest Widget Completion Item Resolution Failed: ', ex));
 	}
 
 	private _setState(state: State): void {
